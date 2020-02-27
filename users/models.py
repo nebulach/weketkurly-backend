@@ -8,7 +8,6 @@ class User(models.Model):
     username    = models.CharField(max_length=45)
     email       = models.EmailField(max_length=100, null=False, unique=True)
     phone       = models.CharField(max_length=15)
-    address     = models.CharField(max_length=200)
     gender_id   = models.ForeignKey('Gender', models.SET_NULL, blank=True, null=True)
     birthday    = models.CharField(max_length=15)
     created_at  = models.DateTimeField(auto_now_add=True)
@@ -34,7 +33,7 @@ class Grade(models.Model):
 class Address(models.Model):
     user            = models.ForeignKey('User', on_delete=models.CASCADE)
     address         = models.CharField(max_length=200)
-    capital_area    = models.BooleanField(defalut=False)
+    capital_area    = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'addresses'
