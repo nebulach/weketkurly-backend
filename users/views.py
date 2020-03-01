@@ -33,6 +33,13 @@ class SignInView(View):
 
 
 class SignUpView(View):
+    def check_capital_area(area):
+        for capital in ['서울', '경기', '인천']:
+            if capital in area:
+                return True
+        
+        return False
+
     def post(self, request):
         user_data = json.loads(request.body)
 
@@ -54,21 +61,12 @@ class SignUpView(View):
                 user_model.save()
 
                 # capital area check
-                for capital in ['서울', '경기', '인천']:
-                    if capital in user_data['address']:
-                        Address(
-                            user=User.objects.get(id=user_model.id),
-                            address=user_data['address'],
-                            is_capital_area = True
-                        ).save()
+                Address(
+                    user=User.objects.get(id=user_model.id),
+                    address=user_data['address'],
+                    is_capital_area = check_capital_area(user_data['address'])
+                ).save()
 
-                        break
-                else:
-                    Address(
-                        user=User.objects.get(id=user_model.id),
-                        address=user_data['address'],
-                        is_capital_area = False
-                    ).save()
             else:
                 return HttpResponse(status=409)
 
@@ -77,7 +75,7 @@ class SignUpView(View):
         
         return HttpResponse(status=200)
 
-
+    
 
 
 class CheckAccountView(View):
@@ -87,7 +85,7 @@ class CheckAccountView(View):
         if User.objects.filter(account=user_account).exists():
             return JsonResponse({'message': 'INVALID_ID'}, status=400)
         else:
-            return JsonResponse({'message' : 'VALID_ID'}, status=200)
+            return HttpResponse(status=200)
 
 class CheckEmailView(View):
     def post(self, request):
@@ -96,5 +94,5 @@ class CheckEmailView(View):
         if User.objects.filter(email=user_email).exists():
             return JsonResponse({'message': 'INVALID_ID'}, status=400)
         else:
-            return JsonResponse({'message' : 'VALID_ID'}, status=200)
+            return HttpResponse(status=200)
 
