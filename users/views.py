@@ -42,31 +42,35 @@ class SignUpView(View):
 
                 user_model = User(
                     account=user_data['account'],
-                    grade=Grade.objects.get(id=1).id
+                    grade=Grade.objects.get(id=1),
                     password=password.decode(),
                     name=user_data['name'],
                     email=user_data['email'],
                     phone=user_data['phone'],
-                    gender=Gender.objects.get(name=user_data['name']).name,
+                    gender=Gender.objects.get(name=user_data['gender']),
                     birthday=user_data['birthday']
-                ).save()
+                )
+
+                user_model.save()
 
                 # capital area check
                 for capital in ['서울', '경기', '인천']:
                     if capital in user_data['address']:
                         Address(
-                            user=user_model.id
-                            address=user_data['address']
+                            user=User.objects.get(id=user_model.id),
+                            address=user_data['address'],
                             is_capital_area = True
                         ).save()
 
                         break
                 else:
                     Address(
-                        user=user_model.id
-                        address=user_data['address']
+                        user=User.objects.get(id=user_model.id),
+                        address=user_data['address'],
                         is_capital_area = False
                     ).save()
+            else:
+                return HttpResponse(status=409)
 
         except KeyError:
             return HttpResponse(status=400)

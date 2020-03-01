@@ -4,8 +4,8 @@ from django.db import models
 class User(models.Model):
     account     = models.CharField(max_length=45, null=False, unique=True)
     grade       = models.ForeignKey('Grade', models.SET_NULL, blank=True, null=True)
-    password    = models.CharField(max_length=50)
-    username    = models.CharField(max_length=45)
+    password    = models.CharField(max_length=300)
+    name        = models.CharField(max_length=45)
     email       = models.EmailField(max_length=100, null=False, unique=True)
     phone       = models.CharField(max_length=15)
     gender      = models.ForeignKey('Gender', models.SET_NULL, blank=True, null=True)
