@@ -47,6 +47,7 @@ class SignUpView(View):
             try:
                 if User.objects.filter(account=user_data['account']).exists():
                     return HttpResponse(status=409)
+                
                 password = bcrypt.hashpw(user_data['password'].encode('utf-8'), bcrypt.gensalt())
 
                 user_model = User(
