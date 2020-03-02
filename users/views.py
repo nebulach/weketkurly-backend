@@ -26,7 +26,7 @@ class SignInView(View):
                 
                 return HttpResponse(status=401)
 
-            return HttpResponse(status=400)
+            return HttpResponse(status=401)
         
         except KeyError:
             return HttpResponse(status=400)
@@ -43,11 +43,11 @@ class SignUpView(View):
     def post(self, request):
         user_data = json.loads(request.body)
         
-        with transaction.atomic():
-            try:
-                if User.objects.filter(account=user_data['account']).exists():
-                    return HttpResponse(status=401)
-                
+        try:
+            if User.objects.filter(account=user_data['account']).exists():
+                return HttpResponse(status=400)
+            
+            with transaction.atomic():
                 password = bcrypt.hashpw(user_data['password'].encode('utf-8'), bcrypt.gensalt())
 
                 user_model = User(
@@ -70,10 +70,10 @@ class SignUpView(View):
                     is_capital_area=self.check_capital_area(user_data['address'])
                 ).save()
 
-                return HttpResponse(status=200)
-            
-            except KeyError:
-                return HttpResponse(status=400)
+            return HttpResponse(status=200)
+        
+        except KeyError:
+            return HttpResponse(status=400)
 
 
 
