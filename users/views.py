@@ -8,6 +8,7 @@ from .utils                         import login_required
 from WeketKurly_backend.settings    import SECRET_KEY, ALGORITHM
 from django.views                   import View
 from django.http                    import HttpResponse, JsonResponse
+from django.db                      import transaction
 
 # Create your views here.
 class SignInView(View):
@@ -33,18 +34,19 @@ class SignInView(View):
 
 
 class SignUpView(View):
-    def check_capital_area(area):
+    def check_capital_area(self, area):
         for capital in ['서울', '경기', '인천']:
             if capital in area:
                 return True
-        
         return False
 
     def post(self, request):
         user_data = json.loads(request.body)
-
-        try:
-            if not User.objects.filter(account=user_data['account']).exists():
+        
+        with transaction.atomic():
+            try:
+                if User.objects.filter(account=user_data['account']).exists():
+                    return HttpResponse(status=409)
                 password = bcrypt.hashpw(user_data['password'].encode('utf-8'), bcrypt.gensalt())
 
                 user_model = User(
@@ -64,18 +66,14 @@ class SignUpView(View):
                 Address(
                     user=User.objects.get(id=user_model.id),
                     address=user_data['address'],
-                    is_capital_area = check_capital_area(user_data['address'])
+                    is_capital_area=self.check_capital_area(user_data['address'])
                 ).save()
 
-            else:
-                return HttpResponse(status=409)
+                return HttpResponse(status=200)
+            
+            except KeyError:
+                return HttpResponse(status=400)
 
-        except KeyError:
-            return HttpResponse(status=400)
-        
-        return HttpResponse(status=200)
-
-    
 
 
 class CheckAccountView(View):
