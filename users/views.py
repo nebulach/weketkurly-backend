@@ -46,7 +46,7 @@ class SignUpView(View):
         pattern1 = r"^(?=.*[\d])(?=.*[A-Za-z])(?=.*[!@#$%^&*()_+={}?:~\[\]])[A-Za-z\d!@#$%^&*()_+={}?:~\[\]]{10,}$"
         pattern2 = r"^(?=.*[\d])(?=.*[A-Za-z])[A-Za-z\d]{10,}$"
         pattern3 = r"^(?=.*[\d])(?=.*[!@#$%^&*()_+={}?:~\[\]])[\d!@#$%^&*()_+={}?:~\[\]]{10,}$"
-        pattern4 = r"(?=.*[A-Za-z])(?=.*[!@#$%^&*()_+={}?:~\[\]])[A-Za-z!@#$%^&*()_+={}?:~\[\]]{10,}$"
+        pattern4 = r"^(?=.*[A-Za-z])(?=.*[!@#$%^&*()_+={}?:~\[\]])[A-Za-z!@#$%^&*()_+={}?:~\[\]]{10,}$"
 
         if re.match(pattern1, password) or re.match(pattern2, password) or re.match(pattern3, password) \
            or re.match(pattern4, password):
@@ -66,7 +66,7 @@ class SignUpView(View):
         return True
 
     def invalid_phone(self, phone):
-        if re.match(r"\d{3}?\d{4}?\d{4}", phone):
+        if re.match(r"^\d{3}?\d{4}?\d{4}$", phone):
             return False
         return True
 
@@ -88,7 +88,9 @@ class SignUpView(View):
 
             if self.invalid_phone(user_data['phone']):
                 return HttpResponse(status=400)
-
+            
+            if user_data['name'] is None:
+                return HttpResponse(status=400)
 
             with transaction.atomic():
                 password = bcrypt.hashpw(user_data['password'].encode('utf-8'), bcrypt.gensalt())
