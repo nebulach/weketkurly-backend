@@ -46,7 +46,7 @@ class SignUpView(View):
         with transaction.atomic():
             try:
                 if User.objects.filter(account=user_data['account']).exists():
-                    return HttpResponse(status=409)
+                    return HttpResponse(status=401)
                 
                 password = bcrypt.hashpw(user_data['password'].encode('utf-8'), bcrypt.gensalt())
 
