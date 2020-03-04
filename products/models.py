@@ -1,5 +1,6 @@
-from django.db      import models
 from users.models   import User
+
+from django.db      import models
 
 class MainCategory(models.Model):
     name            = models.CharField(max_length=50)
@@ -20,10 +21,17 @@ class SubCategory(models.Model):
 
 class SpecialCategory(models.Model):
     name    = models.CharField(max_length=50)
-    product = models.ManyToManyField('Product')
+    product = models.ManyToManyField('Product', through='SpecialCategoryProduct')
 
     class Meta:
         db_table = 'special_categories'
+
+class SpecialCategoryProduct(models.Model):
+    special_category    = models.ForeignKey('SpecialCategory', on_delete=models.SET_NULL, null=True)
+    product             = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True)
+    
+    class Meta:
+        db_table = 'special_categories_products'
 
 class Product(models.Model):
     sub_category        = models.ForeignKey('SubCategory', models.SET_NULL, blank=True, null=True)
@@ -43,7 +51,7 @@ class Product(models.Model):
     sticker_image_url   = models.URLField(max_length=2000)
     detail_image_url    = models.URLField(max_length=2000)
     stocks              = models.IntegerField()
-    tag                 = models.ManyToManyField('Tag')
+    tag                 = models.ManyToManyField('Tag', through='ProductTag')
 
     class Meta:
         db_table = 'products'
@@ -74,3 +82,10 @@ class Tag(models.Model):
 
     class Meta:
         db_table = 'tags'
+
+class ProductTag(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True)
+    tag     = models.ForeignKey('Tag', on_delete=models.SET_NULL, null=True)
+    
+    class Meta:
+        db_table = 'products_tags'
