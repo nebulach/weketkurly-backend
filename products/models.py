@@ -6,7 +6,7 @@ class MainCategory(models.Model):
     icon_active_url = models.CharField(max_length = 2000)
 
     class Meta : 
-        db_table : 'main_categories'
+        db_table = 'main_categories'
 
 
 class SubCategory(models.Model):
@@ -15,4 +15,4 @@ class SubCategory(models.Model):
     thumbnail_url   = models.CharField(max_length = 2000, blank = True, null = True)
 
     class Meta :
-        db_table : 'sub_categories'
+        db_table = 'sub_categories'
