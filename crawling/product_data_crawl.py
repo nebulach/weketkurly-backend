@@ -90,7 +90,7 @@ for key, val in product_dict.items():
 
     product_tuples = (sub_category, product_name, unit_text, weight, origin, contactant, expiration_date, packing_type_text,\
                       original_price, discount_percent, original_image_url, main_image_url, list_image_url, short_description,\
-                      sticker_image_url, detail_image_url, stocks)
+                      sticker_image_url, detail_image_url, stocks, desc, image, info)
     
     product_crawl_list.append(product_tuples)
 
@@ -99,12 +99,13 @@ with open(result_file, 'w+', encoding='utf-8') as csv_file:
 
     csv_writer.writerow(('sub_category', 'product_name', 'unit_text', 'weight', 'origin', 'contactant', 'expiration_date',\
                          'packing_type_text', 'original_price', 'discount_percent', 'original_image_url', 'main_image_url',\
-                         'list_image_url', 'short_description', 'sticker_image_url', 'detail_image_url', 'stocks'))
+                         'list_image_url', 'short_description', 'sticker_image_url', 'detail_image_url', 'stocks',\
+                         'desc', 'image', 'info'))
     
     for rowdata in product_crawl_list:
         csv_writer.writerow((rowdata[0], rowdata[1], rowdata[2], rowdata[3], rowdata[4], rowdata[5], rowdata[6], rowdata[7],\
                              rowdata[8], rowdata[9], rowdata[10], rowdata[11], rowdata[12], rowdata[13], rowdata[14],\
-                             rowdata[15], rowdata[16]))
+                             rowdata[15], rowdata[16], rowdata[17], rowdata[18], rowdata[19]))
 
 
 
