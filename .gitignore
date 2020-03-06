@@ -222,3 +222,4 @@ tags
 
 ## private_setting
 my_settings.py
+*.csv
