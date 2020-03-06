@@ -12,7 +12,7 @@ class MainCategory(models.Model):
 
 
 class SubCategory(models.Model):
-    main_category   = models.ForeignKey('MainCategory', models.SET_NULL, blank=True, null=True)
+    maincategory   = models.ForeignKey('MainCategory', models.SET_NULL, blank=True, null=True)
     name            = models.CharField(max_length=50)
     thumbnail_url   = models.URLField(max_length=2000, blank=True, null=True)
 
