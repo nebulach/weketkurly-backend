@@ -1,6 +1,5 @@
 from django.db import models
 
-# Create your models here.
 class User(models.Model):
     account     = models.CharField(max_length=45, null=False, unique=True)
     grade       = models.ForeignKey('Grade', models.SET_NULL, blank=True, null=True)
@@ -9,7 +8,7 @@ class User(models.Model):
     email       = models.EmailField(max_length=100, null=False, unique=True)
     phone       = models.CharField(max_length=15)
     gender      = models.ForeignKey('Gender', models.SET_NULL, blank=True, null=True)
-    birthday    = models.CharField(max_length=15)
+    birthday    = models.DateField()
     created_at  = models.DateTimeField(auto_now_add=True)
     updated_at  = models.DateTimeField(auto_now=True)
 
@@ -23,9 +22,9 @@ class Gender(models.Model):
         db_table = 'genders'
 
 class Grade(models.Model):
-    name        = models.CharField(max_length=10)
-    info        = models.CharField(max_length=45)
-    percentage  = models.DecimalField(max_digits=3, decimal_places=1)
+    name               = models.CharField(max_length    = 10)
+    info               = models.CharField(max_length    = 45)
+    mileage_percentage = models.DecimalField(max_digits = 3, decimal_places = 1)
 
     class Meta:
         db_table = 'grades'

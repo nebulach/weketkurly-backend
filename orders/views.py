@@ -19,4 +19,5 @@ class CreditCardView(View):
             }
             for card in CreditCard.objects.all()
         ]
+
         return JsonResponse({"data" : list(credit_list)}, status = 200)
