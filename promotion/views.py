@@ -85,7 +85,7 @@ class RecommendationView(View) :
             "title"     : "오늘의 신상품",
             "subtitle"  : "매일 정오, 컬리의 새로운 상품을 만나보세요",
             "products"  : new_product
-        }
+            }
         
         hot_product = [
             {
