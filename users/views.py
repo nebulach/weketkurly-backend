@@ -12,15 +12,14 @@ from django.http                    import HttpResponse, JsonResponse
 from django.db                      import transaction
 from django.core.validators         import validate_email
 from django.core.exceptions         import ValidationError
+from .utils                         import login_required
 
-# Create your views here.
 class SignInView(View):
     def post(self, request):
         user_data = json.loads(request.body)
-
         try:
-            if User.objects.filter(account=user_data['account']).exists():
-                account = User.objects.get(account=user_data['account'])
+            if User.objects.filter(account = user_data['account']).exists():
+                account = User.objects.get(account = user_data['account'])
 
                 if bcrypt.checkpw(user_data['password'].encode('utf-8'), account.password.encode('utf-8')):
                     token = jwt.encode({'account_id' : account.id}, SECRET_KEY, algorithm=ALGORITHM)
@@ -35,12 +34,14 @@ class SignInView(View):
             return HttpResponse(status=400) 
 
 
+
 class SignUpView(View):
     def check_capital_area(self, area):
         for capital in ['서울', '경기', '인천']:
             if capital in area:
                 return True
         return False
+
 
     def invalid_password(self, password):
         pattern1 = r"^(?=.*[\d])(?=.*[A-Za-z])(?=.*[!@#$%^&*()_+={}?:~\[\]])[A-Za-z\d!@#$%^&*()_+={}?:~\[\]]{10,}$"
@@ -49,7 +50,7 @@ class SignUpView(View):
         pattern4 = r"^(?=.*[A-Za-z])(?=.*[!@#$%^&*()_+={}?:~\[\]])[A-Za-z!@#$%^&*()_+={}?:~\[\]]{10,}$"
 
         if re.match(pattern1, password) or re.match(pattern2, password) or re.match(pattern3, password) \
-           or re.match(pattern4, password):
+            or re.match(pattern4, password):
             if re.search(r"^(\d)(\1{2})", password):
                 return True
             return False
@@ -65,6 +66,7 @@ class SignUpView(View):
             return False
         return True
 
+
     def invalid_phone(self, phone):
         if re.match(r"^\d{3}?\d{4}?\d{4}$", phone):
             return False
@@ -73,11 +75,10 @@ class SignUpView(View):
 
     def post(self, request):
         user_data = json.loads(request.body)
-        
         try:
             if User.objects.filter(account=user_data['account']).exists():
                 return HttpResponse(status=400)
-           
+
             if self.invalid_account(user_data['account']):
                 return HttpResponse(status=400)
 
@@ -96,33 +97,35 @@ class SignUpView(View):
                 password = bcrypt.hashpw(user_data['password'].encode('utf-8'), bcrypt.gensalt())
 
                 user_model = User(
-                    account=user_data['account'],
-                    grade=Grade.objects.get(id=1),
-                    password=password.decode(),
-                    name=user_data['name'],
-                    email=user_data['email'],
-                    phone=user_data['phone'],
-                    gender=Gender.objects.get(name=user_data['gender']),
-                    birthday=user_data['birthday']
+                    account     = user_data['account'],
+                    grade       = Grade.objects.get(id = 1),
+                    password    = password.decode(),
+                    name        = user_data['name'],
+                    email       = user_data['email'],
+                    phone       = user_data['phone'],
+                    gender      = Gender.objects.get(name = user_data['gender']),
+                    birthday    = user_data['birthday']
                 )
 
                 user_model.save()
 
-                # capital area check
                 Address(
-                    user=User.objects.get(id=user_model.id),
-                    address=user_data['address'],
-                    is_capital_area=self.check_capital_area(user_data['address'])
+                    user            = User.objects.get(id = user_model.id),
+                    address         = user_data['address'],
+                    is_capital_area = self.check_capital_area(user_data['address'])
                 ).save()
 
-                return HttpResponse(status=200)
+                return JsonResponse({"data" : 
+                    {   'account'   : user_data['account'],
+                        'name'      : user_data['name'],
+                        'email'     : user_data['email']}
+                        }, status = 200)
         
         except KeyError:
             return HttpResponse(status=400)
 
         except ValidationError:
             return HttpResponse(status=400)
-
 
 
 
@@ -135,6 +138,7 @@ class CheckAccountView(View):
         else:
             return HttpResponse(status=200)
 
+
 class CheckEmailView(View):
     def post(self, request):
         user_email = json.loads(request.body)
@@ -144,3 +148,17 @@ class CheckEmailView(View):
         else:
             return HttpResponse(status=200)
 
+
+class MyPageView(View) :
+    @login_required
+    def get(self, request) :
+        try : 
+            user = User.objects.get(account = request.user.account)
+            user_information = {       
+                'name'       : user.name,
+                'grade'      : user.grade,
+                'grade_info' : user.grade  #info 타고가야됨 
+            }
+            return JsonResponse(user_information, status = 200)
+        except user.DoesNotExist :
+            return JsonResponse({"message":"INVALID_USER"}, status=400)

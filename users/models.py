@@ -9,7 +9,7 @@ class User(models.Model):
     email       = models.EmailField(max_length=100, null=False, unique=True)
     phone       = models.CharField(max_length=15)
     gender      = models.ForeignKey('Gender', models.SET_NULL, blank=True, null=True)
-    birthday    = models.CharField(max_length=15)
+    birth       = models.CharField(max_length=15)
     created_at  = models.DateTimeField(auto_now_add=True)
     updated_at  = models.DateTimeField(auto_now=True)
 
