@@ -134,6 +134,33 @@ class ProductTotalListView(View) :
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
 
 
+class ProductTotalListView(View) :
+    def get(self, request, main_id) :
+        products = [
+            {
+                'name'              : product.name,
+                'original_price'    : product.original_price,
+                'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
+                'shortdesc'         : product.short_description,
+                'list_image_url'    : product.list_image_url,
+                'sticker_image_url' : sticker_image_url(product.discount_percent)               
+            }
+            for product in MainCategory.objects.filter(id = 1).prefetch_related('subcategory_set')[0].subcategory_set.prefetch_related('product_set')[0].product_set.all()
+        ]
+        
+        data = {
+            'category_name'         : MainCategory.objects.get(id = main_id).name,
+            'products'              : products
+        }
+        
+        paging = {
+            'total'                 : MainCategory.objects.filter(id = 1).prefetch_related('subcategory_set')[0].subcategory_set.prefetch_related('product_set')[0].product_set.count(),
+            'next_page_no'          : 2 #페이지네이션 구현
+        }
+        
+        return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
+
+
 class DetailView(View) :
     def get(self, request, product_id) :
         product = Product.objects.get(id = product_id)
