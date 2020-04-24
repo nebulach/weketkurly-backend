@@ -103,16 +103,13 @@ class SubCategoryView(View) :
         
 class ProductListView(View) :
     def get(self, request, sub_id) :
-        viewPage     = request.GET.get('viewPage', None)
-        sort         = request.GET.get('sort_type', None)
+        viewPage        = request.GET.get('viewPage', None)
+        sort            = request.GET.get('sort_type', None)
         
-        product_list = Product.objects.filter(sub_category_id = sub_id)
-        
-        paginator = sorting(product_list, sort)
-                
-        contacts = pagination(paginator, viewPage)
-
-        products = product_info(contacts)
+        product_list    = Product.objects.filter(sub_category_id = sub_id)
+        paginator       = sorting(product_list, sort)
+        contacts        = pagination(paginator, viewPage)
+        products        = product_info(contacts)
         
         data = {
             'category_no'           : sub_id,
@@ -139,11 +136,9 @@ class ProductTotalListView(View) :
             b               = MainCategory.objects.prefetch_related('subcategory_set').get(id = main_id).subcategory_set.prefetch_related('product_set')[i].product_set.all()
             product_list    = product_list.union(b)
             
-        paginator = sorting(product_list, sort)
-        
-        contacts = pagination(paginator, viewPage)
-
-        products = product_info(contacts)
+        paginator   = sorting(product_list, sort)
+        contacts    = pagination(paginator, viewPage)
+        products    = product_info(contacts)
         
         data = {
             'category_name'         : MainCategory.objects.get(id = main_id).name,
@@ -161,6 +156,7 @@ class ProductTotalListView(View) :
 class DetailView(View) :
     def get(self, request, product_id) :
         product = Product.objects.get(id = product_id)
+        
         data = {
                 'no'                        : product.id,
                 'name'                      : product.name,
@@ -188,8 +184,8 @@ class SearchView(View) :
         keyword      = request.GET.get('keyword', None)
         viewPage     = request.GET.get('viewPage', None)
         
-        product_search = Product.objects.filter(  Q(name__icontains = keyword) | 
-                                                Q(short_description__icontains = keyword) 
+        product_search = Product.objects.filter(    Q(name__icontains = keyword) | 
+                                                    Q(short_description__icontains = keyword) 
                                                 ).all()
         
         detail_search = DetailInfomation.objects.filter(Q (product_description__icontains = keyword) |
@@ -197,11 +193,9 @@ class SearchView(View) :
                                                         ).select_related('product')
         
         
-        paginator    = Paginator(product_search, 99)
-        
-        contacts = pagination(paginator, viewPage)
-        
-        products = product_info(contacts)
+        paginator       = Paginator(product_search, 99)
+        contacts        = pagination(paginator, viewPage)
+        products        = product_info(contacts)
         
         data = {
             'products'              : products
@@ -216,16 +210,13 @@ class SearchView(View) :
     
 class NewView(View) : 
     def get(self, request) :
-        viewPage     = request.GET.get('viewPage', None)
-        sort         = request.GET.get('sort_type', None)
+        viewPage        = request.GET.get('viewPage', None)
+        sort            = request.GET.get('sort_type', None)
         
-        product_list = Product.objects.filter(incoming_date__year = 2020)
-
-        paginator = sorting(product_list, sort)
-        
-        contacts = pagination(paginator, viewPage)
-
-        products = product_info(contacts)
+        product_list    = Product.objects.filter(incoming_date__year = 2020)
+        paginator       = sorting(product_list, sort)
+        contacts        = pagination(paginator, viewPage)
+        products        = product_info(contacts)
         
         data = {
             'category_name'         : '신상품',
@@ -241,16 +232,13 @@ class NewView(View) :
     
 class BestView(View) : 
     def get(self, request) :
-        viewPage     = request.GET.get('viewPage', None)
-        sort         = request.GET.get('sort_type', None)
+        viewPage        = request.GET.get('viewPage', None)
+        sort            = request.GET.get('sort_type', None)
         
-        product_list = Product.objects.order_by('-sales_index')[:99]
-        
-        paginator = sorting(product_list, sort)
-        
-        contacts = pagination(paginator, viewPage)
-        
-        products = product_info(contacts)
+        product_list    = Product.objects.order_by('-sales_index')[:99]
+        paginator       = sorting(product_list, sort)
+        contacts        = pagination(paginator, viewPage)
+        products        = product_info(contacts)
         
         data = {
             'category_name'         : '베스트',
@@ -266,16 +254,13 @@ class BestView(View) :
 
 class SaleView(View) : 
     def get(self, request) :
-        viewPage     = request.GET.get('viewPage', None)
-        sort         = request.GET.get('sort_type', None)
+        viewPage        = request.GET.get('viewPage', None)
+        sort            = request.GET.get('sort_type', None)
         
-        product_list = Product.objects.exclude(discount_percent = 0)
-        
-        paginator = sorting(product_list, sort)
-        
-        contacts = pagination(paginator, viewPage)
-        
-        products = product_info(contacts)
+        product_list    = Product.objects.exclude(discount_percent = 0)
+        paginator       = sorting(product_list, sort)
+        contacts        = pagination(paginator, viewPage)
+        products        = product_info(contacts)
         
         data = {
             'category_name'         : '알뜰쇼핑',
