@@ -35,7 +35,7 @@ def get_category() :
     category = requests.get('https://api.kurly.com/v2/categories?ver=1')
     cate_json = category.json()['data']['categories']
 
-    for sub in cate_json[5]['categories'] :
+    for sub in cate_json[14]['categories'] :
         sub_num = sub['no']
         get_nextpage(sub_num, 1)
         print('-----')
@@ -76,10 +76,13 @@ def get_products(sub_num, page) :
             print(name)
             
             try :
-                product_id = Product.objects.filter(name = name)[0].id
+                product_id = Product.objects.filter(name = name).last().id
                 product_ids.append(product_id)
             
             except IndexError:
+                continue
+            
+            except AttributeError: 
                 continue
             
             kurly_url = 'https://www.kurly.com/shop/goods/goods_view.php?&goodsno=' + product['no']
@@ -104,7 +107,7 @@ def get_data():
     df['product_image']             = product_images
     df['product_information']       = product_informations
     
-    df.to_csv("./detail5.csv", encoding = 'utf8')  
+    df.to_csv("./detail14.csv", encoding = 'utf8')  
     print('Done.')
 
 get_data()

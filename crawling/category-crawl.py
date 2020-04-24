@@ -48,7 +48,7 @@ def get_category() :
     category = requests.get('https://api.kurly.com/v2/categories?ver=1')
     cate_json = category.json()['data']['categories']
 
-    for sub in cate_json[5]['categories'] :
+    for sub in cate_json[14]['categories'] :
         sub_num = sub['no']
         get_nextpage(sub_num, 1)
         print('-----')
@@ -159,7 +159,7 @@ def get_data():
     df['list_image_url']           = list_image_urls
     df['incoming_date']             = incoming_dates
     
-    df.to_csv("./product5.csv", encoding = 'utf8')  
+    df.to_csv("./product14.csv", encoding = 'utf8')  
     print('Done.')
 
 get_data()

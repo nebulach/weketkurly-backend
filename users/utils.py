@@ -1,28 +1,29 @@
-import jwt
-import json
+import jwt                                                
+import json                 
 
-from .models                        import User
-from WeketKurly_backend.settings    import SECRET_KEY
+from django.http            import JsonResponse
+from django.core.exceptions import ObjectDoesNotExist 
 
-from django.http                    import JsonResponse
+from my_settings            import SECRET_KEY                      
+from users.models           import User
 
-def login_required(func):
-    def wrapper(self, request, *args, **kwargs):
-        token = request.headers.get("Authorization", None)
+def user_authentication(func):
+    def wrapper_func(self, request, *args, **kwargs):
+        if "Authorization" not in request.headers:
+            return JsonResponse({"error_code":"INVALID_LOGIN"}, status=401)
 
-        if token is None:
-            return JsonResponse({'message' : "LOGIN_REQUIRED"}, status=401)
-        else:
-            try:
-                decode          = jwt.decode(token, SECRET_KEY, algorithm='HS256')
-                user_id         = decode.get('account_id', None)
-                user            = User.objects.get(id=account_id)
-                request.user    = user
+        encode_token = request.headers["Authorization"]
 
-                return func(self, request, *args, **kwargs)
-            except jwt.DecodeError:
-                return JsonResponse({'message' : 'INVALID_TOKEN'}, status=400)
-            except User.DoesNotExist:
-                return JsonResponse({'message' : 'ACCOUNT_NOT_EXIST'}, status=400)
-    
-    return wrapper
+        try:
+            data            = jwt.decode(encode_token, SECRET_KEY['secret'], algorithm='HS256')
+            user            = User.objects.get(id = data['account_id'])
+            request.user    = user
+
+        except jwt.DecodeError:
+            return JsonResponse({"error_code":"INVALID_TOKEN"}, status = 401)
+
+        except User.DoesNotExist:
+            return JsonResponse({"error_code":"UNKNOWN_USER"}, status = 401)
+
+        return func(self, request, *args, **kwargs)
+    return wrapper_func

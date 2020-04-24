@@ -16,18 +16,27 @@ def sticker_image_url(discount) :
     
 class RecommendationView(View) :
     def get(self, request) :
-        banners =   {
-                    "banners" : list(Notice.objects.all().values('id', 'banner_image'))
+        
+        banner_list = [
+            {
+                'id'        : banner.id,
+                'image_url' : banner.banner_image
+            }
+            for banner in Notice.objects.all()
+        ]
+        
+        banners =   {  
+                    "banners" : banner_list
                     }
         
         recommendation_product = [
             {
-                'no'                : product.id,
-                'name'              : product.name,
-                'original_price'    : product.original_price,
-                'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
-                'list_image_url'    : product.list_image_url,
-                'sticker_image_url' : sticker_image_url(product.discount_percent)    
+                'no'                    : product.id,
+                'name'                  : product.name,
+                'original_price'        : product.original_price,
+                'price'                 : int(product.original_price * (100 - int(product.discount_percent)) / 100),
+                'list_image_url'        : product.list_image_url,
+                'sticker_image_url'     : sticker_image_url(product.discount_percent)    
             }
             
             for product in Product.objects.order_by('?')[:8]
@@ -47,12 +56,12 @@ class RecommendationView(View) :
         
         discount_product = [
             {
-                'no'                : product.id,
-                'name'              : product.name,
-                'original_price'    : product.original_price,
-                'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
-                'list_image_url'    : product.list_image_url,
-                'sticker_image_url' : sticker_image_url(product.discount_percent)  
+                'no'                    : product.id,
+                'name'                  : product.name,
+                'original_price'        : product.original_price,
+                'price'                 : int(product.original_price * (100 - int(product.discount_percent)) / 100),
+                'list_image_url'        : product.list_image_url,
+                'sticker_image_url'     : sticker_image_url(product.discount_percent)  
             }
             
             for product in Product.objects.exclude(discount_percent = 0).order_by('?')[:6]
@@ -70,12 +79,12 @@ class RecommendationView(View) :
                 
         new_product = [
             {
-                'no'                : product.id,
-                'name'              : product.name,
-                'original_price'    : product.original_price,
-                'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
-                'list_image_url'    : product.list_image_url,
-                'sticker_image_url' : sticker_image_url(product.discount_percent) 
+                'no'                    : product.id,
+                'name'                  : product.name,
+                'original_price'        : product.original_price,
+                'price'                 : int(product.original_price * (100 - int(product.discount_percent)) / 100),
+                'list_image_url'        : product.list_image_url,
+                'sticker_image_url'     : sticker_image_url(product.discount_percent) 
             }
             
             for product in Product.objects.order_by('-incoming_date')[:6]
@@ -88,13 +97,13 @@ class RecommendationView(View) :
             }
         
         hot_product = [
-            {
-                'no'                : product.id,
-                'name'              : product.name,
-                'original_price'    : product.original_price,
-                'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
-                'list_image_url'    : product.list_image_url,
-                'sticker_image_url' : sticker_image_url(product.discount_percent) 
+            {   
+                'no'                    : product.id,
+                'name'                  : product.name,
+                'original_price'        : product.original_price,
+                'price'                 : int(product.original_price * (100 - int(product.discount_percent)) / 100),
+                'list_image_url'        : product.list_image_url,
+                'sticker_image_url'     : sticker_image_url(product.discount_percent) 
             }
             
             for product in Product.objects.order_by('-sales_index')[:6]
@@ -107,12 +116,12 @@ class RecommendationView(View) :
         
         sale_product = [
             {
-                'no'                : product.id,
-                'name'              : product.name,
-                'original_price'    : product.original_price,
-                'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
-                'list_image_url'    : product.list_image_url,
-                'sticker_image_url' : sticker_image_url(product.discount_percent)  
+                'no'                    : product.id,
+                'name'                  : product.name,
+                'original_price'        : product.original_price,
+                'price'                 : int(product.original_price * (100 - int(product.discount_percent)) / 100),
+                'list_image_url'        : product.list_image_url,
+                'sticker_image_url'     : sticker_image_url(product.discount_percent)  
             }
             
             for product in Product.objects.exclude(discount_percent = 0).order_by('?')[:6]
@@ -125,12 +134,12 @@ class RecommendationView(View) :
         
         less_than_3000_product = [
             {
-                'no'                : product.id,
-                'name'              : product.name,
-                'original_price'    : product.original_price,
-                'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
-                'list_image_url'    : product.list_image_url,
-                'sticker_image_url' : sticker_image_url(product.discount_percent)  
+                'no'                    : product.id,
+                'name'                  : product.name,
+                'original_price'        : product.original_price,
+                'price'                 : int(product.original_price * (100 - int(product.discount_percent)) / 100),
+                'list_image_url'        : product.list_image_url,
+                'sticker_image_url'     : sticker_image_url(product.discount_percent)  
             }
             
             for product in Product.objects.all().filter(original_price__lte = 3000).order_by('?')[:6]

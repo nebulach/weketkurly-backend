@@ -26,7 +26,6 @@ for main in main_category:
     for sub_category in main['categories']:
         main_dict[(main['no'], main['name'])].append((sub_category['no'], sub_category['name']))
 
-#print(main_dict)
 
 for key, value in main_dict.items():
     start_page = 1
@@ -47,13 +46,11 @@ for key, value in main_dict.items():
             
             start_page += 1
 
-#print(product_dict)
 product_crawl_list = []
 
 for key, val in product_dict.items():
     sub_category    = key[0]
     product_no      = key[1]
-    #print("product_no: ", product_no)
     product_name    = val
     product_req     = requests.get(f'https://www.kurly.com/shop/goods/goods_view.php?&goodsno={product_no}')
     product_req2    = requests.get(f'https://api.kurly.com/v3/home/products/{product_no}?&ver=1583404862438')
@@ -66,7 +63,6 @@ for key, val in product_dict.items():
     product_info    = product_soup.select('#goods-infomation')
 
     product_page_data   = product_data['data']
-    print(product_page_data)
     unit_text           = product_page_data.get('unit_text', '')
     weight              = product_page_data.get('weight', '')
     origin              = product_page_data.get('origin', '')
