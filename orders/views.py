@@ -9,6 +9,7 @@ from django.views           import View
 from django.http            import HttpResponse, JsonResponse 
 from django.db.models       import Sum
 
+
 class CreditCardView(View):
     def get(self, request):
         credit_list = [
@@ -17,12 +18,14 @@ class CreditCardView(View):
                 'card_description'      : card.card_description,
                 'card_point'            : card.card_point,
                 'card_discount_event'   : card.card_discount_event,
-                'installment_perioid'   : [
-                    install['installment_period']  
-                for install in card.installmentperiod_set.values()] 
+                'installment_perioid'   :   [
+                                            install['installment_period']  
+                                            for install in card.installmentperiod_set.values()
+                                            ] 
             }
             for card in CreditCard.objects.all()
         ]
+        
         return JsonResponse({"data" : list(credit_list)}, status = 200)
     
     
@@ -40,7 +43,6 @@ class CartView(View) :
                 )
                 
                 return HttpResponse(status=200)
-
                 
             else :
                 CartDetail(
@@ -58,14 +60,20 @@ class CartView(View) :
     def get(self, request) :
         cart        = Cart.objects.filter(user_id = request.user.id).last()
         carts       = Cart.objects.prefetch_related('cartdetail_set').get(id = cart.id).cartdetail_set.all()
+        
         data = [
             {
-                "product_num"   : cart.products_id,
-                "product_name"  : Product.objects.get(id = cart.products_id).name,
-                "quantity"      : cart.quantity
+                "product_num"           : cart.products_id,
+                "name"                  : Product.objects.get(id = cart.products_id).name,
+                "original_price"        : Product.objects.get(id = cart.products_id).original_price,
+                "discounted_price"      : int(Product.objects.get(id = cart.products_id).original_price * (100 - int(Product.objects.get(id = cart.products_id).discount_percent)) / 100),
+                "ea"                    : cart.quantity,
+                "min_ea"                : 1,
+                "max_ea"                : 999,
+                "thumbnail_image_url"   : Product.objects.get(id = cart.products_id).cart_image_url
             }
             for cart in carts
-        ]
+                ]
         
         return JsonResponse({'data' : list(data)}, status = 200)
     
@@ -101,8 +109,8 @@ class OrderView(View) :
                     
                 else :
                     user_address = Address (
-                        user_id = request.user.id,
-                        address = data['address'],
+                        user_id         = request.user.id,
+                        address         = data['address'],
                         is_capital_area = self.check_capital_area(data['address'])
                     )
                     user_address.save()
@@ -122,7 +130,7 @@ class OrderView(View) :
             ).save()
         
             Cart(
-                user            = User.objects.get(id = request.user.id)
+                user                = User.objects.get(id = request.user.id)
             ).save()
             
             return HttpResponse(status = 200)
@@ -137,10 +145,11 @@ class OrderView(View) :
         def products(num) : 
             product = [
                 {
-                    'name'      : cart.products.name,          
-                    'quantity'  : cart.quantity,                
-                    'price'     : cart.products.original_price,  
-                    'image'     : cart.products.cart_image_url
+                    'name'                  : cart.products.name,          
+                    'ea'                    : cart.quantity,                
+                    'original_price'        : cart.products.original_price,  
+                    'discounted_price'      : int(Product.objects.get(id = cart.products_id).original_price * (100 - int(Product.objects.get(id = cart.products_id).discount_percent)) / 100),
+                    'thumbnail_image_url'   : cart.products.cart_image_url
                 }
                 for cart in CartDetail.objects.select_related('products').filter(cart_id = num)
             ]
@@ -150,19 +159,10 @@ class OrderView(View) :
             {
                 "order_number"  : order.order_number,
                 "created_at"    : order.created_at,
-                "product"       : products(order.id)
+                "product"       : products(order.cart_id)
             }
             for order in orders
         ]
         return JsonResponse({'data' : list(data)}, status = 200)
         
 
-class AddressView(View) :
-    @user_authentication
-    def get(self,request) :
-        try :
-            data = Address.objects.filter(user_id = request.user).values('user_id', 'address')    
-            return JsonResponse({'data' : list(data)}, status = 200)
-        
-        except KeyError :
-            return HttpResponse(status = 400)

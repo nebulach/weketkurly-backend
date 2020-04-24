@@ -6,6 +6,7 @@ from django.http        import HttpResponse, JsonResponse
 from .models            import Notice, Event, Recipe
 from products.models    import *
 
+
 def sticker_image_url(discount) :
     if int(discount) == 0 :
         return ""

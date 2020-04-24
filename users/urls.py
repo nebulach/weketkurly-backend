@@ -4,7 +4,8 @@ from .views         import (
     SignUpView, 
     CheckAccountView, 
     CheckEmailView, 
-    MyPageView
+    MyPageView,
+    AddressView
 )
 
 urlpatterns = [
@@ -12,5 +13,6 @@ urlpatterns = [
     path('/sign-up', SignUpView.as_view()),
     path('/check-account', CheckAccountView.as_view()),
     path('/check-email', CheckEmailView.as_view()),
-    path('/mypage', MyPageView.as_view())
+    path('/mypage', MyPageView.as_view()),
+    path('/address', AddressView.as_view())
 ]

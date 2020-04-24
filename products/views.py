@@ -1,4 +1,5 @@
 import json
+import operator
 
 from .models                import MainCategory, SubCategory, Product, DetailInfomation
 
@@ -29,6 +30,7 @@ def sorting(product_list, sort) :
 def product_info(contacts) :
     products = [
         {
+            'id'                : product.id,
             'name'              : product.name,
             'original_price'    : product.original_price,
             'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
@@ -54,7 +56,7 @@ def pagination(paginator, viewPage) :
     
     return contacts
         
-      
+
 def sticker_image_url(discount) :
     if int(discount) == 0 :
         return ""
@@ -75,6 +77,7 @@ class CategoryView(View) :
             }
             for main in MainCategory.objects.all().prefetch_related('subcategory_set')
         ]
+        
         return JsonResponse({"data" : category}, status = 200)
 
 
@@ -121,6 +124,7 @@ class ProductListView(View) :
             'total'                 : product_list.count(),
             'total_page_no'         : paginator.num_pages
         }
+        
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
 
 
@@ -176,6 +180,7 @@ class DetailView(View) :
                 'product_image'             : DetailInfomation.objects.get(product_id = product_id).product_image,
                 'product_information'       : DetailInfomation.objects.get(product_id = product_id).product_infomation
                 }
+        
         return JsonResponse({'data' : data}, status = 200)
     
     
@@ -196,15 +201,16 @@ class SearchView(View) :
         paginator       = Paginator(product_search, 99)
         contacts        = pagination(paginator, viewPage)
         products        = product_info(contacts)
-        
-        data = {
+
+        data =  {
             'products'              : products
-        }
+                }
         
-        paging = {
+        paging =    {
             'total'                 : product_search.count(),
             'total_page_no'         : paginator.num_pages
-        }
+                    }
+        
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
     
     
@@ -218,25 +224,40 @@ class NewView(View) :
         contacts        = pagination(paginator, viewPage)
         products        = product_info(contacts)
         
-        data = {
+        data =  {
             'category_name'         : '신상품',
             'products'              : products
-        }
+                }
         
-        paging = {
+        paging =    {
             'total'                 : product_list.count(),
             'total_page_no'         : paginator.num_pages
-        }
+                    }
+        
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
     
     
-class BestView(View) : 
+class BestView(View) :  
     def get(self, request) :
         viewPage        = request.GET.get('viewPage', None)
         sort            = request.GET.get('sort_type', None)
-        
+
         product_list    = Product.objects.order_by('-sales_index')[:99]
-        paginator       = sorting(product_list, sort)
+        ordered         = sorted(product_list, key = operator.attrgetter('sales_index'))
+        
+        if sort == '1' :
+            ordered = product_list
+
+        elif sort == '2' :
+            ordered = sorted(product_list, key = operator.attrgetter('original_price'))
+
+        elif sort == '3' :
+            ordered = sorted(product_list, key = operator.attrgetter('original_price'), reverse = True) 
+
+        else :
+            ordered = sorted(product_list, key = operator.attrgetter('incoming_date'), reverse = True)   
+        
+        paginator       = Paginator(ordered, 99)    
         contacts        = pagination(paginator, viewPage)
         products        = product_info(contacts)
         
@@ -249,6 +270,7 @@ class BestView(View) :
             'total'                 : product_list.count(),
             'total_page_no'         : paginator.num_pages
         }
+        
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
     
 
@@ -271,4 +293,5 @@ class SaleView(View) :
             'total'                 : product_list.count(),
             'total_page_no'         : paginator.num_pages
         }
+        
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
