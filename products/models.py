@@ -38,7 +38,7 @@ class Product(models.Model):
     detail_image_url        = models.URLField(max_length = 2000, blank = True, null = True)
     list_image_url          = models.URLField(max_length = 2000, blank = True, null = True)
     incoming_date           = models.DateTimeField()
-    tag                     = models.ManyToManyField('Tag', through='ProductTag')
+    tag                     = models.ManyToManyField('Tag', through = 'ProductTag')
 
     class Meta:
         db_table = 'products'
@@ -52,18 +52,10 @@ class DetailInfomation(models.Model):
 
     class Meta:
         db_table = 'detail_infomations'
-        
-        
-class Package(models.Model) :
-    product = models.ForeignKey('Product', models.CASCADE)
-    name    = models.CharField(max_length = 100)
-    
-    class Meta:
-        db_table = 'packages'
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length = 50)
 
     class Meta:
         db_table = 'tags'

@@ -56,21 +56,37 @@ def sticker_image_url(discount) :
         
 class ProductListView(View) :
     def get(self, request, sub_id) :
-        product_list = Product.objects.filter(sub_category_id = sub_id)
-        paginator    = Paginator(product_list, 99)
         viewPage     = request.GET.get('viewPage', None)
+        sort         = request.GET.get('sort_type', None)
         
+        product_list = Product.objects.filter(sub_category_id = sub_id)
+        
+        if sort == '1' :
+            product_list = product_list.order_by('-sales_index')
+        
+        elif sort == '2' :
+            product_list = product_list.order_by('original_price')
+            
+        elif sort == '3' :
+            product_list = product_list.order_by('-original_price')
+        
+        else :
+            product_list = product_list.order_by('-incoming_date')
+                
+        paginator    = Paginator(product_list, 99)        
+                
         try:
             contacts = paginator.page(viewPage)
             
         except PageNotAnInteger:
-            contacts = paginator.page(1)   # 숫자가 입력되지 않으면 페이지1 출력
+            contacts = paginator.page(1)  
         
         except EmptyPage:
-            return HttpResponse(status = 400)  #없는 페이지수를 입력하면 에러코드 400 리턴
+            return HttpResponse(status = 400) 
         
         products = [
             {
+                'id'                : product.id,
                 'name'              : product.name,
                 'original_price'    : product.original_price,
                 'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
@@ -96,9 +112,30 @@ class ProductListView(View) :
 
 class ProductTotalListView(View) :
     def get(self, request, main_id) :
-        product_list = MainCategory.objects.filter(id = 1).prefetch_related('subcategory_set')[0].subcategory_set.prefetch_related('product_set')[0].product_set.all()
-        paginator    = Paginator(product_list, 99)
         viewPage     = request.GET.get('viewPage', None)
+        sort         = request.GET.get('sort_type', None)
+
+        total_sub       = MainCategory.objects.prefetch_related('subcategory_set').get(id = main_id).subcategory_set.count()
+        product_list    = MainCategory.objects.prefetch_related('subcategory_set').get(id = main_id).subcategory_set.prefetch_related('product_set').get(id = 1).product_set.all()
+        
+        for i in range(1, total_sub) :
+            b               = MainCategory.objects.prefetch_related('subcategory_set').get(id = main_id).subcategory_set.prefetch_related('product_set').get(id = (i+1)).product_set.all()
+            product_list    = product_list.union(b)
+            
+
+        if sort == '1' :
+            product_list = product_list.order_by('-sales_index')
+        
+        elif sort == '2' :
+            product_list = product_list.order_by('original_price')
+            
+        elif sort == '3' :
+            product_list = product_list.order_by('-original_price')
+        
+        else :
+            product_list = product_list.order_by('-incoming_date')
+            
+        paginator    = Paginator(product_list, 99)
         
         try:
             contacts = paginator.page(viewPage)
@@ -129,33 +166,6 @@ class ProductTotalListView(View) :
         paging = {
             'total'                 : product_list.count(),
             'total_page_no'         : paginator.num_pages
-        }
-        
-        return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
-
-
-class ProductTotalListView(View) :
-    def get(self, request, main_id) :
-        products = [
-            {
-                'name'              : product.name,
-                'original_price'    : product.original_price,
-                'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
-                'shortdesc'         : product.short_description,
-                'list_image_url'    : product.list_image_url,
-                'sticker_image_url' : sticker_image_url(product.discount_percent)               
-            }
-            for product in MainCategory.objects.filter(id = 1).prefetch_related('subcategory_set')[0].subcategory_set.prefetch_related('product_set')[0].product_set.all()
-        ]
-        
-        data = {
-            'category_name'         : MainCategory.objects.get(id = main_id).name,
-            'products'              : products
-        }
-        
-        paging = {
-            'total'                 : MainCategory.objects.filter(id = 1).prefetch_related('subcategory_set')[0].subcategory_set.prefetch_related('product_set')[0].product_set.count(),
-            'next_page_no'          : 2 #페이지네이션 구현
         }
         
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
@@ -191,10 +201,16 @@ class SearchView(View) :
         keyword      = request.GET.get('keyword', None)
         viewPage     = request.GET.get('viewPage', None)
         
-        product_list = Product.objects.filter(  Q(name__icontains = keyword) | 
+        product_search = Product.objects.filter(  Q(name__icontains = keyword) | 
                                                 Q(short_description__icontains = keyword) 
                                                 ).all()
-        paginator    = Paginator(product_list, 99)
+        
+        detail_search = DetailInfomation.objects.filter(Q (product_description__icontains = keyword) |
+                                                        Q (product_infomation__icontains = keyword)
+                                                        ).select_related('product')
+        
+        
+        paginator    = Paginator(product_search, 99)
         
         try:
             contacts = paginator.page(viewPage)
@@ -222,7 +238,7 @@ class SearchView(View) :
         }
         
         paging = {
-            'total'                 : product_list.count(),
+            'total'                 : product_search.count(),
             'total_page_no'         : paginator.num_pages
         }
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
@@ -231,8 +247,22 @@ class SearchView(View) :
 class NewView(View) : 
     def get(self, request) :
         viewPage     = request.GET.get('viewPage', None)
+        sort         = request.GET.get('sort_type', None)
         
         product_list = Product.objects.filter(incoming_date__year = 2020)
+
+        if sort == '1' :
+            product_list = product_list.order_by('-sales_index')
+        
+        elif sort == '2' :
+            product_list = product_list.order_by('original_price')
+            
+        elif sort == '3' :
+            product_list = product_list.order_by('-original_price')
+        
+        else :
+            product_list = product_list.order_by('-incoming_date')
+            
         paginator    = Paginator(product_list, 99)
         
         try:
@@ -271,7 +301,19 @@ class NewView(View) :
 class BestView(View) : 
     def get(self, request) :
         viewPage     = request.GET.get('viewPage', None)
+        sort         = request.GET.get('sort_type', None)
+        
         product_list = Product.objects.order_by('-sales_index')[:99]
+        
+        if sort == '0' :
+            product_list = product_list.order_by('-incoming_date')
+        
+        elif sort == '2' :
+            product_list = product_list.order_by('original_price')
+            
+        elif sort == '3' :
+            product_list = product_list.order_by('-original_price')
+        
         paginator    = Paginator(product_list, 99)
         
         try:
@@ -310,8 +352,19 @@ class BestView(View) :
 class SaleView(View) : 
     def get(self, request) :
         viewPage     = request.GET.get('viewPage', None)
+        sort         = request.GET.get('sort_type', None)
         
         product_list = Product.objects.exclude(discount_percent = 0)
+        
+        if sort == '0' :
+            product_list = product_list.order_by('-incoming_date')
+        
+        elif sort == '2' :
+            product_list = product_list.order_by('original_price')
+            
+        elif sort == '3' :
+            product_list = product_list.order_by('-original_price')
+        
         paginator    = Paginator(product_list, 99)
         
         try:
