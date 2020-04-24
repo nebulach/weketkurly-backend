@@ -13,7 +13,7 @@
 [GET]    main category product list  
 [GET]    product detail  
 [GET]    recommendation  
-[GET]    search  
+[GET]    search products
 [GET]    new products  
 [GET]    best products  
 [GET]    sale products  
@@ -31,3 +31,22 @@
 [POST]   order  
 [GET]    order list  
 [GET]    credit card information  
+  
+## DB Modeling
+![modeling](modeling.jpeg)
+  
+## Features  
+- 카테고리 별로 상품과 세부사항, 태그 크롤링
+- 상품의 이름, 짧은 설명, 세부사항을 기반으로 하는 검색 기능 구현
+- 특정 상품과 관련된 상품 리스트 구현
+- 가장 잘 팔린 상품 상위 99개, 올해 입고된 신 상품, 할인 상품 리스트 구현
+- 상품을 장바구니에 추가하고, 수량 업데이트, 삭제, 장바구니에 담긴 상품을 볼 수 있는 cart CRUD 구현
+- 장바구니에 담긴 상품을 주문하고, 사용자 별로 주문 내역 볼 수 있는 기능 구현
+- 사용자가 주문시 기입했던 주소 목록을 재주문시 선택할 수 있는 기능 구현
+- 페이지네이션
+- 사용자 회원가입 및 비밀번호 암호화 기능
+- 가입시 적절한 Email, ID 인지 확인하는 기능(중복여부, 기준)
+- 로그인시 사용자에게 토큰 발행 
+  
+## contact me
+ljy6816@gmail.com
