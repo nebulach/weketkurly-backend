@@ -103,21 +103,18 @@ class OrderView(View) :
             cart            = Cart.objects.filter(user_id = request.user.id).last()
             order_number    = self.ID_OFFSET + Order.objects.latest('id').id
             
-            if data['new_address'] == "True" : 
-                if Address.objects.filter(user_id = request.user.id, address = data['address']).exists() :
-                    receiver_address = Address.objects.filter(user_id = request.user.id, address = data['address']).id
-                    
-                else :
-                    user_address = Address (
-                        user_id         = request.user.id,
-                        address         = data['address'],
-                        is_capital_area = self.check_capital_area(data['address'])
-                    )
-                    user_address.save()
-                    receiver_address = user_address.id
-                    
+            if Address.objects.filter(user_id = request.user.id, address = data['address']).exists() :
+                receiver_address = Address.objects.get(user_id = request.user.id, address = data['address']).id
+                
             else :
-                receiver_address = data['address']
+                user_address = Address (
+                    user_id         = request.user.id,
+                    address         = data['address'],
+                    is_capital_area = self.check_capital_area(data['address'])
+                )
+                user_address.save()
+                receiver_address = user_address.id
+                    
                 
             Order(
                 user_id             = request.user.id,
@@ -140,7 +137,7 @@ class OrderView(View) :
         
     @user_authentication
     def get(self, request) : 
-        orders = Order.objects.filter(user_id = request.user)
+        orders = Order.objects.filter(user_id = request.user).order_by('-created_at')
         
         def products(num) : 
             product = [
