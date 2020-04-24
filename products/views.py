@@ -42,6 +42,19 @@ def product_info(contacts) :
     return products
 
 
+def pagination(paginator, viewPage) :
+    try:
+        contacts = paginator.page(viewPage)
+        
+    except PageNotAnInteger:
+        contacts = paginator.page(1)   
+    
+    except EmptyPage:
+        return HttpResponse(status = 400) 
+    
+    return contacts
+        
+      
 def sticker_image_url(discount) :
     if int(discount) == 0 :
         return ""
@@ -97,15 +110,8 @@ class ProductListView(View) :
         
         paginator = sorting(product_list, sort)
                 
-        try:
-            contacts = paginator.page(viewPage)
-            
-        except PageNotAnInteger:
-            contacts = paginator.page(1)  
-        
-        except EmptyPage:
-            return HttpResponse(status = 400) 
-        
+        contacts = pagination(paginator, viewPage)
+
         products = product_info(contacts)
         
         data = {
@@ -135,15 +141,8 @@ class ProductTotalListView(View) :
             
         paginator = sorting(product_list, sort)
         
-        try:
-            contacts = paginator.page(viewPage)
-            
-        except PageNotAnInteger:
-            contacts = paginator.page(1)   
-        
-        except EmptyPage:
-            return HttpResponse(status = 400) 
-        
+        contacts = pagination(paginator, viewPage)
+
         products = product_info(contacts)
         
         data = {
@@ -200,14 +199,7 @@ class SearchView(View) :
         
         paginator    = Paginator(product_search, 99)
         
-        try:
-            contacts = paginator.page(viewPage)
-            
-        except PageNotAnInteger:
-            contacts = paginator.page(1)   
-        
-        except EmptyPage:
-            return HttpResponse(status = 400)  
+        contacts = pagination(paginator, viewPage)
         
         products = product_info(contacts)
         
@@ -231,15 +223,8 @@ class NewView(View) :
 
         paginator = sorting(product_list, sort)
         
-        try:
-            contacts = paginator.page(viewPage)
-            
-        except PageNotAnInteger:
-            contacts = paginator.page(1)   
-        
-        except EmptyPage:
-            return HttpResponse(status = 400) 
-        
+        contacts = pagination(paginator, viewPage)
+
         products = product_info(contacts)
         
         data = {
@@ -263,14 +248,7 @@ class BestView(View) :
         
         paginator = sorting(product_list, sort)
         
-        try:
-            contacts = paginator.page(viewPage)
-            
-        except PageNotAnInteger:
-            contacts = paginator.page(1)   
-        
-        except EmptyPage:
-            return HttpResponse(status = 400) 
+        contacts = pagination(paginator, viewPage)
         
         products = product_info(contacts)
         
@@ -295,14 +273,7 @@ class SaleView(View) :
         
         paginator = sorting(product_list, sort)
         
-        try:
-            contacts = paginator.page(viewPage)
-            
-        except PageNotAnInteger:
-            contacts = paginator.page(1)   
-        
-        except EmptyPage:
-            return HttpResponse(status = 400) 
+        contacts = pagination(paginator, viewPage)
         
         products = product_info(contacts)
         
