@@ -1,4 +1,5 @@
 import json
+import operator
 
 from .models                import MainCategory, SubCategory, Product, DetailInfomation
 
@@ -29,6 +30,7 @@ def sorting(product_list, sort) :
 def product_info(contacts) :
     products = [
         {
+            'id'                : product.id,
             'name'              : product.name,
             'original_price'    : product.original_price,
             'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
@@ -54,7 +56,7 @@ def pagination(paginator, viewPage) :
     
     return contacts
         
-      
+
 def sticker_image_url(discount) :
     if int(discount) == 0 :
         return ""
@@ -75,6 +77,7 @@ class CategoryView(View) :
             }
             for main in MainCategory.objects.all().prefetch_related('subcategory_set')
         ]
+        
         return JsonResponse({"data" : category}, status = 200)
 
 
@@ -103,16 +106,13 @@ class SubCategoryView(View) :
         
 class ProductListView(View) :
     def get(self, request, sub_id) :
-        viewPage     = request.GET.get('viewPage', None)
-        sort         = request.GET.get('sort_type', None)
+        viewPage        = request.GET.get('viewPage', None)
+        sort            = request.GET.get('sort_type', None)
         
-        product_list = Product.objects.filter(sub_category_id = sub_id)
-        
-        paginator = sorting(product_list, sort)
-                
-        contacts = pagination(paginator, viewPage)
-
-        products = product_info(contacts)
+        product_list    = Product.objects.filter(sub_category_id = sub_id)
+        paginator       = sorting(product_list, sort)
+        contacts        = pagination(paginator, viewPage)
+        products        = product_info(contacts)
         
         data = {
             'category_no'           : sub_id,
@@ -124,6 +124,7 @@ class ProductListView(View) :
             'total'                 : product_list.count(),
             'total_page_no'         : paginator.num_pages
         }
+        
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
 
 
@@ -139,11 +140,9 @@ class ProductTotalListView(View) :
             b               = MainCategory.objects.prefetch_related('subcategory_set').get(id = main_id).subcategory_set.prefetch_related('product_set')[i].product_set.all()
             product_list    = product_list.union(b)
             
-        paginator = sorting(product_list, sort)
-        
-        contacts = pagination(paginator, viewPage)
-
-        products = product_info(contacts)
+        paginator   = sorting(product_list, sort)
+        contacts    = pagination(paginator, viewPage)
+        products    = product_info(contacts)
         
         data = {
             'category_name'         : MainCategory.objects.get(id = main_id).name,
@@ -161,6 +160,7 @@ class ProductTotalListView(View) :
 class DetailView(View) :
     def get(self, request, product_id) :
         product = Product.objects.get(id = product_id)
+        
         data = {
                 'no'                        : product.id,
                 'name'                      : product.name,
@@ -180,6 +180,7 @@ class DetailView(View) :
                 'product_image'             : DetailInfomation.objects.get(product_id = product_id).product_image,
                 'product_information'       : DetailInfomation.objects.get(product_id = product_id).product_infomation
                 }
+        
         return JsonResponse({'data' : data}, status = 200)
     
     
@@ -188,8 +189,8 @@ class SearchView(View) :
         keyword      = request.GET.get('keyword', None)
         viewPage     = request.GET.get('viewPage', None)
         
-        product_search = Product.objects.filter(  Q(name__icontains = keyword) | 
-                                                Q(short_description__icontains = keyword) 
+        product_search = Product.objects.filter(    Q(name__icontains = keyword) | 
+                                                    Q(short_description__icontains = keyword) 
                                                 ).all()
         
         detail_search = DetailInfomation.objects.filter(Q (product_description__icontains = keyword) |
@@ -197,60 +198,68 @@ class SearchView(View) :
                                                         ).select_related('product')
         
         
-        paginator    = Paginator(product_search, 99)
+        paginator       = Paginator(product_search, 99)
+        contacts        = pagination(paginator, viewPage)
+        products        = product_info(contacts)
         
-        contacts = pagination(paginator, viewPage)
-        
-        products = product_info(contacts)
-        
-        data = {
+        data =  {
             'products'              : products
-        }
+                }
         
-        paging = {
+        paging =    {
             'total'                 : product_search.count(),
             'total_page_no'         : paginator.num_pages
-        }
+                    }
+        
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
     
     
 class NewView(View) : 
     def get(self, request) :
-        viewPage     = request.GET.get('viewPage', None)
-        sort         = request.GET.get('sort_type', None)
+        viewPage        = request.GET.get('viewPage', None)
+        sort            = request.GET.get('sort_type', None)
         
-        product_list = Product.objects.filter(incoming_date__year = 2020)
-
-        paginator = sorting(product_list, sort)
+        product_list    = Product.objects.filter(incoming_date__year = 2020)
+        paginator       = sorting(product_list, sort)
+        contacts        = pagination(paginator, viewPage)
+        products        = product_info(contacts)
         
-        contacts = pagination(paginator, viewPage)
-
-        products = product_info(contacts)
-        
-        data = {
+        data =  {
             'category_name'         : '신상품',
             'products'              : products
-        }
+                }
         
-        paging = {
+        paging =    {
             'total'                 : product_list.count(),
             'total_page_no'         : paginator.num_pages
-        }
+                    }
+        
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
     
     
-class BestView(View) : 
+class BestView(View) :  
     def get(self, request) :
-        viewPage     = request.GET.get('viewPage', None)
-        sort         = request.GET.get('sort_type', None)
+        viewPage        = request.GET.get('viewPage', None)
+        sort            = request.GET.get('sort_type', None)
         
-        product_list = Product.objects.order_by('-sales_index')[:99]
+        product_list    = Product.objects.order_by('-sales_index')[:99]
+        ordered         = sorted(product_list, key = operator.attrgetter('sales_index'))
         
-        paginator = sorting(product_list, sort)
+        if sort == '1' :
+            ordered = product_list
+
+        elif sort == '2' :
+            ordered = sorted(product_list, key = operator.attrgetter('original_price'))
+
+        elif sort == '3' :
+            ordered = sorted(product_list, key = operator.attrgetter('original_price'), reverse = True) 
+
+        else :
+            ordered = sorted(product_list, key = operator.attrgetter('incoming_date'), reverse = True)   
         
-        contacts = pagination(paginator, viewPage)
-        
-        products = product_info(contacts)
+        paginator       = Paginator(ordered, 99)    
+        contacts        = pagination(paginator, viewPage)
+        products        = product_info(contacts)
         
         data = {
             'category_name'         : '베스트',
@@ -261,21 +270,19 @@ class BestView(View) :
             'total'                 : product_list.count(),
             'total_page_no'         : paginator.num_pages
         }
+        
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
     
 
 class SaleView(View) : 
     def get(self, request) :
-        viewPage     = request.GET.get('viewPage', None)
-        sort         = request.GET.get('sort_type', None)
+        viewPage        = request.GET.get('viewPage', None)
+        sort            = request.GET.get('sort_type', None)
         
-        product_list = Product.objects.exclude(discount_percent = 0)
-        
-        paginator = sorting(product_list, sort)
-        
-        contacts = pagination(paginator, viewPage)
-        
-        products = product_info(contacts)
+        product_list    = Product.objects.exclude(discount_percent = 0)
+        paginator       = sorting(product_list, sort)
+        contacts        = pagination(paginator, viewPage)
+        products        = product_info(contacts)
         
         data = {
             'category_name'         : '알뜰쇼핑',
@@ -286,4 +293,5 @@ class SaleView(View) :
             'total'                 : product_list.count(),
             'total_page_no'         : paginator.num_pages
         }
+        
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)

@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class User(models.Model):
     account     = models.CharField(max_length=45, null=False, unique=True)
     grade       = models.ForeignKey('Grade', models.SET_NULL, blank=True, null=True)

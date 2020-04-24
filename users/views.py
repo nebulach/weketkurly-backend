@@ -14,8 +14,10 @@ from django.db                      import transaction
 from django.core.validators         import validate_email
 from django.core.exceptions         import ValidationError
 
+
 ID_VALID    = r'^(?=.*[a-z])[a-z0-9]{6,16}$'
 EMAIL_VALID = r'^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z\-]+$'
+
 
 class SignInView(View):
     def post(self, request):
@@ -172,3 +174,14 @@ class MyPageView(View) :
         
         except user.DoesNotExist :
             return JsonResponse({"message":"INVALID_USER"}, status=400)
+        
+
+class AddressView(View) :
+    @user_authentication
+    def get(self,request) :
+        try :
+            data = Address.objects.filter(user_id = request.user).values('user_id', 'address').order_by('-id')
+            return JsonResponse({'data' : list(data)}, status = 200)
+        
+        except KeyError :
+            return HttpResponse(status = 400)
