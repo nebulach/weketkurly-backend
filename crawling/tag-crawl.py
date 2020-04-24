@@ -1,4 +1,3 @@
-#아직 하나도 안건드림. 복붙만 함 
 import csv
 import os
 import re
