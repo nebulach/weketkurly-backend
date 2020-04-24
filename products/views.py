@@ -201,7 +201,7 @@ class SearchView(View) :
         paginator       = Paginator(product_search, 99)
         contacts        = pagination(paginator, viewPage)
         products        = product_info(contacts)
-        
+
         data =  {
             'products'              : products
                 }
@@ -241,7 +241,7 @@ class BestView(View) :
     def get(self, request) :
         viewPage        = request.GET.get('viewPage', None)
         sort            = request.GET.get('sort_type', None)
-        
+
         product_list    = Product.objects.order_by('-sales_index')[:99]
         ordered         = sorted(product_list, key = operator.attrgetter('sales_index'))
         
