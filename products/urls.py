@@ -8,7 +8,8 @@ from .views         import (
     SearchView, 
     NewView, 
     BestView, 
-    SaleView
+    SaleView,
+    RelatedView
     )
 
 
@@ -21,5 +22,6 @@ urlpatterns = [
     path('/search', SearchView.as_view()),
     path('/newproducts', NewView.as_view()),
     path('/best', BestView.as_view()),
-    path('/timesale', SaleView.as_view())
+    path('/timesale', SaleView.as_view()),
+    path('/related/<int:product_id>', RelatedView.as_view())
 ]
