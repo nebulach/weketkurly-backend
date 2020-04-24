@@ -54,7 +54,7 @@ def pagination(paginator, viewPage) :
     
     return contacts
         
-        
+      
 def sticker_image_url(discount) :
     if int(discount) == 0 :
         return ""
@@ -111,7 +111,7 @@ class ProductListView(View) :
         paginator = sorting(product_list, sort)
                 
         contacts = pagination(paginator, viewPage)
-        
+
         products = product_info(contacts)
         
         data = {
@@ -142,7 +142,7 @@ class ProductTotalListView(View) :
         paginator = sorting(product_list, sort)
         
         contacts = pagination(paginator, viewPage)
-        
+
         products = product_info(contacts)
         
         data = {
@@ -224,7 +224,7 @@ class NewView(View) :
         paginator = sorting(product_list, sort)
         
         contacts = pagination(paginator, viewPage)
-        
+
         products = product_info(contacts)
         
         data = {
