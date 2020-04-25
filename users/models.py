@@ -16,11 +16,13 @@ class User(models.Model):
     class Meta:
         db_table = 'users'
 
+
 class Gender(models.Model):
     name        = models.CharField(max_length=10)
 
     class Meta:
         db_table = 'genders'
+
 
 class Grade(models.Model):
     name        = models.CharField(max_length = 10)
@@ -29,6 +31,7 @@ class Grade(models.Model):
 
     class Meta:
         db_table = 'grades'
+
 
 class Address(models.Model):
     user            = models.ForeignKey('User', on_delete=models.CASCADE)

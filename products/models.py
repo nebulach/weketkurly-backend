@@ -55,15 +55,15 @@ class DetailInfomation(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length = 50)
+    name                    = models.CharField(max_length = 50)
 
     class Meta:
         db_table = 'tags'
 
 
 class ProductTag(models.Model):
-    product = models.ForeignKey('Product', on_delete = models.SET_NULL, null = True)
-    tag     = models.ForeignKey('Tag', on_delete = models.SET_NULL, null = True)
+    product                 = models.ForeignKey('Product', on_delete = models.SET_NULL, null = True)
+    tag                     = models.ForeignKey('Tag', on_delete = models.SET_NULL, null = True)
     
     class Meta:
         db_table = 'products_tags'
