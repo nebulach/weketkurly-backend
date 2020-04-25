@@ -56,7 +56,6 @@ def pagination(paginator, viewPage) :
     
     return contacts
         
-
 def sticker_image_url(discount) :
     if int(discount) == 0 :
         return ""
