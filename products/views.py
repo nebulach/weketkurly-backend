@@ -304,7 +304,7 @@ class RelatedView(View) :
         
         data = [
             {
-                'id'                : product.id,
+                'no'                : product.id,
                 'name'              : product.name,
                 'original_price'    : product.original_price,
                 'list_image_url'    : product.list_image_url
