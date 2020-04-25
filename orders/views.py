@@ -40,7 +40,7 @@ class CartView(View) :
             if cartdetail.exists(): 
                 cartdetail.update(
                     quantity = data['quantity']
-                )
+                    )
                 
                 return HttpResponse(status=200)
                 
@@ -115,7 +115,6 @@ class OrderView(View) :
                 user_address.save()
                 receiver_address = user_address.id
                     
-                
             Order(
                 user_id             = request.user.id,
                 cart_id             = cart.id,
@@ -155,7 +154,7 @@ class OrderView(View) :
         data = [
             {
                 "order_number"  : order.order_number,
-                "created_at"    : order.created_at,
+                "created_at"    : order.created_at.strftime('%Y.%m.%d (%H시 %M분)'),
                 "product"       : products(order.cart_id)
             }
             for order in orders
