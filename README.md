@@ -32,9 +32,11 @@
 [GET]    order list  
 [GET]    credit card information  
   
-## DB Modeling
-![modeling](modeling.jpeg)
-  
+## DB Modeling  
+![modeling](modeling.jpeg)  
+[Aquery URL](https://aquerytool.com:443/aquerymain/index/?rurl=6fc7d34f-9187-4837-9cd7-c37918756338&)  
+Password : 47k7ye  
+
 ## Features  
 - 카테고리 별로 상품과 세부사항, 태그 크롤링
 - 상품의 이름, 짧은 설명, 세부사항을 기반으로 하는 검색 기능 구현
@@ -48,5 +50,8 @@
 - 가입시 적절한 Email, ID 인지 확인하는 기능(중복여부, 기준)
 - 로그인시 사용자에게 토큰 발행 
   
+## Demonstration Video
+!youtube[T8nSHWib8RI]
+
 ## contact me
-ljy6816@gmail.com
+E-mail : ljy6816@gmail.com
