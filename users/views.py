@@ -180,7 +180,7 @@ class AddressView(View) :
     @user_authentication
     def get(self,request) :
         try :
-            data = Address.objects.filter(user_id = request.user).values('user_id', 'address').order_by('-id')
+            data = Address.objects.filter(user_id = request.user).values('id', 'user_id', 'address').order_by('-id')
             return JsonResponse({'data' : list(data)}, status = 200)
         
         except KeyError :
