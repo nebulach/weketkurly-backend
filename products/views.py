@@ -30,7 +30,7 @@ def sorting(product_list, sort) :
 def product_info(contacts) :
     products = [
         {
-            'id'                : product.id,
+            'no'                : product.id,
             'name'              : product.name,
             'original_price'    : product.original_price,
             'price'             : int(product.original_price * (100 - int(product.discount_percent)) / 100),
@@ -295,3 +295,21 @@ class SaleView(View) :
         }
         
         return JsonResponse({'data' : data, 'paging' : paging}, status = 200)
+    
+
+class RelatedView(View) :
+    def get(self, request, product_id) : 
+        sub_id          = Product.objects.select_related('sub_category').get(id = 50).sub_category.id
+        product_list    = Product.objects.filter(sub_category_id = sub_id).exclude(id = product_id).order_by('?')[:30]
+        
+        data = [
+            {
+                'id'                : product.id,
+                'name'              : product.name,
+                'original_price'    : product.original_price,
+                'list_image_url'    : product.list_image_url
+            }
+            for product in product_list
+        ]
+        
+        return JsonResponse({'data' : data}, status = 200)
