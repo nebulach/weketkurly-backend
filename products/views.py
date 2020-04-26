@@ -27,6 +27,19 @@ def sorting(product_list, sort) :
     return paginator    
     
 
+def pagination(paginator, viewPage) :
+    try:
+        contacts = paginator.page(viewPage)
+        
+    except PageNotAnInteger:
+        contacts = paginator.page(1)   
+    
+    except EmptyPage:
+        return HttpResponse(status = 400) 
+    
+    return contacts
+
+
 def product_info(contacts) :
     products = [
         {
@@ -43,18 +56,6 @@ def product_info(contacts) :
             
     return products
 
-
-def pagination(paginator, viewPage) :
-    try:
-        contacts = paginator.page(viewPage)
-        
-    except PageNotAnInteger:
-        contacts = paginator.page(1)   
-    
-    except EmptyPage:
-        return HttpResponse(status = 400) 
-    
-    return contacts
         
 def sticker_image_url(discount) :
     if int(discount) == 0 :
@@ -188,14 +189,10 @@ class SearchView(View) :
         keyword      = request.GET.get('keyword', None)
         viewPage     = request.GET.get('viewPage', None)
         
-        product_search = Product.objects.filter(    Q(name__icontains = keyword) | 
-                                                    Q(short_description__icontains = keyword) 
-                                                ).all()
-        
-        detail_search = DetailInfomation.objects.filter(Q (product_description__icontains = keyword) |
-                                                        Q (product_infomation__icontains = keyword)
-                                                        ).select_related('product')
-        
+        product_search = Product.objects.filter(    
+                                Q(name__icontains = keyword) | 
+                                Q(short_description__icontains = keyword) 
+                                ).all()
         
         paginator       = Paginator(product_search, 99)
         contacts        = pagination(paginator, viewPage)
