@@ -3,8 +3,20 @@
 
 ## 팀원 구성
 - Back-end 2명
-- Front-end 3명 
+- Front-end 3명 ([git repository](https://github.com/wecode-bootcamp-korea/weketkurly-frontend))
 
+## Skill
+- Python
+- Django
+- Requests
+- BeautifulSoup
+- Pandas
+- CORS headers
+- Bcrypt
+- JWT
+- MySQL
+- Git
+  
 ## API
 [Postman Documentation](https://lahanhotel.postman.co/collections/10398712-5faf389a-97cb-4821-9361-3f30ba875a00?version=latest&workspace=d7f5a55d-4000-4c2c-9009-b4de89ee6806#e162fc1c-abc1-4fa3-a8f7-032ae7f38860)  
 [GET]    category  
