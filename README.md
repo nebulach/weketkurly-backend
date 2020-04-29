@@ -63,7 +63,7 @@ Password : 47k7ye
 - 로그인시 사용자에게 토큰 발행 
   
 ## Demonstration Video
-!youtube[T8nSHWib8RI]
+[![](thumbnail.png)](https://youtu.be/Nm4u8LUM368)
 
 ## contact me
 E-mail : ljy6816@gmail.com
